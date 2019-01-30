@@ -7,9 +7,10 @@ sys.path.append('../scikit-surgeryimage')
 import logging
 import cv2
 
-from sksurgeryimage.acquire import video_writer, source_wrapper
+from sksurgeryimage.acquire import video_writer, video_source
 from sksurgeryimage.utilities.camera_utilities import count_cameras
-from sksurgeryvtk.vtk import vtk_overlay_window, vtk_model
+from sksurgeryvtk.widgets import vtk_overlay_window
+from sksurgeryvtk.models import vtk_surface_model_directory_loader
 from PySide2.QtWidgets import QApplication, QWidget
 
 logging.basicConfig(level=logging.INFO)
@@ -19,7 +20,7 @@ class BasicOverlayDemo():
 
     def __init__(self):
 
-        self.wrapper = source_wrapper.VideoSourceWrapper()
+        self.wrapper = video_source.VideoSourceWrapper()
         self.wrapper.save_timestamps = True
 
         self.vtk_overlay_windows = []
@@ -45,7 +46,7 @@ class BasicOverlayDemo():
         """
         Add VTK Models to scene.
         """
-        model_loader = vtk_model.LoadVTKModelsFromDirectory()
+        model_loader = vtk_surface_model_directory_loader.VTKSurfaceModelDirectoryLoader()
         vtk_models = model_loader.get_models(model_dir)
         
         for overlay in self.vtk_overlay_windows:
