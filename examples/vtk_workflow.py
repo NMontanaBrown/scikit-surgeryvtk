@@ -46,19 +46,18 @@ class BasicOverlayDemo():
         """
         Add VTK Models to scene.
         """
-        model_loader = vtk_surface_model_directory_loader.VTKSurfaceModelDirectoryLoader()
-        vtk_models = model_loader.get_models(model_dir)
+        model_loader = vtk_surface_model_directory_loader.VTKSurfaceModelDirectoryLoader(model_dir)
         
         for overlay in self.vtk_overlay_windows:
-            overlay.update_background_renderer()  
-            overlay.add_VTK_models(vtk_models)
+            overlay.update_video_image_camera()
+            overlay.add_vtk_models(model_loader.models)
 
     def synchronise_vtk_cameras(self):
         """
         Make all VTK windows use the same camera for the model layer
         If the model is rotated/moved in one view, the others ones also change.
         """
-        overlay_master_camera = self.vtk_overlay_windows[0].get_model_camera()
+        overlay_master_camera = self.vtk_overlay_windows[0].get_foreground_camera()
         for idx in range(1, self.num_cameras):
             self.vtk_overlay_windows[idx].link_foreground_cameras(overlay_master_camera)
 
@@ -77,7 +76,7 @@ class BasicOverlayDemo():
             cv2.waitKey(1)
 
             for overlay in self.vtk_overlay_windows:
-                overlay.update_background_renderer()
+                overlay.update_video_image_camera()
 
             self.writer.write_frame()
 
@@ -89,9 +88,8 @@ def main():
     app = QApplication([])
 
     demo = BasicOverlayDemo()
-    
 
-    model_dir = 'tests/data/models/Liver'
+    model_dir = '../tests/data/models/Liver'
     output_file = 'outputs/test.avi'
 
     demo.add_vtk_models_to_scene( model_dir)
