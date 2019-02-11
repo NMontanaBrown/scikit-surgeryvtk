@@ -135,8 +135,9 @@ def project_facing_points(points,
                                 )
     camera_direction_t = camera_direction.transpose()
 
-    facing_points = points[np.einsum('ij,ij->i', normals, camera_direction_t)
-                           < upper_cos_theta]
+    # find which indexes of original points face the camera
+    facing_indexes = np.where(np.einsum('ij,ij->i', normals, camera_direction_t) < upper_cos_theta)
+    facing_points = points[facing_indexes]
 
     projected_points = np.zeros((0, 1, 2))
 
@@ -146,7 +147,7 @@ def project_facing_points(points,
                                           camera_matrix,
                                           distortion=distortion
                                           )
-    return projected_points
+    return projected_points, facing_indexes
 
 
 def compute_rms_error(model_points,
