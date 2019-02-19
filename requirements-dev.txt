@@ -8,9 +8,9 @@ coverage
 mock
 pyfakefs
 parameterized
-pylint
-sphinx
-sphinx_rtd_theme
-pyinstaller
+# pylint
+# sphinx
+# sphinx_rtd_theme
+# pyinstaller
 pytest
 tox
