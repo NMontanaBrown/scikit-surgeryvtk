@@ -11,28 +11,9 @@ from vtk.util import numpy_support
 import sksurgerycore.utilities.validate_file as vf
 import sksurgeryvtk.models.vtk_base_model as vbm
 import sksurgeryvtk.utils.matrix_utils as mu
+from sksurgeryvtk.vtk.error_observer import ErrorObserver
 
 # pylint: disable=too-many-instance-attributes
-
-class ErrorObserver:
-
-   def __init__(self):
-       self.__ErrorOccurred = False
-       self.__ErrorMessage = None
-       self.CallDataType = 'string0'
-
-   def __call__(self, obj, event, message):
-       self.__ErrorOccurred = True
-       self.__ErrorMessage = message
-
-   def ErrorOccurred(self):
-       occ = self.__ErrorOccurred
-       self.__ErrorOccurred = False
-       return occ
-
-   def ErrorMessage(self):
-       return self.__ErrorMessage
-
 
 class VTKSurfaceModel(vbm.VTKBaseModel):
     """
@@ -117,8 +98,8 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.mapper = vtk.vtkPolyDataMapper()
         self.mapper.SetInputConnection(self.transform_filter.GetOutputPort())
         self.mapper.Update()
-        if error_observer.ErrorOccurred():
-            raise RuntimeError(error_observer.ErrorMessage())
+        if error_observer.error_occurred():
+            raise RuntimeError(error_observer.error_message())
         self.actor.SetMapper(self.mapper)
 
     def set_model_transform(self, matrix):
