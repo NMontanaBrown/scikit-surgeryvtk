@@ -14,6 +14,25 @@ import sksurgeryvtk.utils.matrix_utils as mu
 
 # pylint: disable=too-many-instance-attributes
 
+class ErrorObserver:
+
+   def __init__(self):
+       self.__ErrorOccurred = False
+       self.__ErrorMessage = None
+       self.CallDataType = 'string0'
+
+   def __call__(self, obj, event, message):
+       self.__ErrorOccurred = True
+       self.__ErrorMessage = message
+
+   def ErrorOccurred(self):
+       occ = self.__ErrorOccurred
+       self.__ErrorOccurred = False
+       return occ
+
+   def ErrorMessage(self):
+       return self.__ErrorMessage
+
 
 class VTKSurfaceModel(vbm.VTKBaseModel):
     """
@@ -86,6 +105,9 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.transform = vtk.vtkTransform()
         self.transform.Identity()
         self.transform_filter = vtk.vtkTransformPolyDataFilter()
+
+        error_observer = ErrorObserver()
+        self.transform_filter.AddObserver('ErrorEvent', error_observer)
         if self.normals is None:
             self.transform_filter.SetInputData(self.source)
         else:
@@ -95,6 +117,8 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.mapper = vtk.vtkPolyDataMapper()
         self.mapper.SetInputConnection(self.transform_filter.GetOutputPort())
         self.mapper.Update()
+        if error_observer.ErrorOccurred():
+            raise RuntimeError(error_observer.ErrorMessage())
         self.actor.SetMapper(self.mapper)
 
     def set_model_transform(self, matrix):
