@@ -11,7 +11,6 @@ from vtk.util import numpy_support
 import sksurgerycore.utilities.validate_file as vf
 import sksurgeryvtk.models.vtk_base_model as vbm
 import sksurgeryvtk.utils.matrix_utils as mu
-from sksurgeryvtk.vtk.error_observer import ErrorObserver
 
 # pylint: disable=too-many-instance-attributes
 
@@ -21,7 +20,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
     read from a file, but could be created on the fly.
     """
     def __init__(self, filename, colour, visibility=True, opacity=1.0,
-                 pickable=True):
+                 pickable=True, error_observer=None):
         """
         Creates a new surface model.
 
@@ -86,9 +85,8 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.transform = vtk.vtkTransform()
         self.transform.Identity()
         self.transform_filter = vtk.vtkTransformPolyDataFilter()
-
-        error_observer = ErrorObserver()
-        self.transform_filter.AddObserver('ErrorEvent', error_observer)
+        if error_observer is not None:
+            self.transform_filter.AddObserver('ErrorEvent', error_observer)
         if self.normals is None:
             self.transform_filter.SetInputData(self.source)
         else:
@@ -98,8 +96,7 @@ class VTKSurfaceModel(vbm.VTKBaseModel):
         self.mapper = vtk.vtkPolyDataMapper()
         self.mapper.SetInputConnection(self.transform_filter.GetOutputPort())
         self.mapper.Update()
-        if error_observer.error_occurred():
-            raise RuntimeError(error_observer.error_message())
+
         self.actor.SetMapper(self.mapper)
 
     def set_model_transform(self, matrix):

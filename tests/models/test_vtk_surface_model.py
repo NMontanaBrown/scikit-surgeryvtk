@@ -3,11 +3,12 @@
 import pytest
 import vtk
 import numpy as np
-from vtk.util import colors
-from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
 import cv2
 import sys
 import os
+from vtk.util import colors
+from sksurgeryvtk.models.vtk_surface_model import VTKSurfaceModel
+from sksurgeryvtk.vtk.error_observer import ErrorObserver
 
 @pytest.fixture(scope="function")
 def valid_vtk_model():
@@ -42,6 +43,16 @@ def test_its_valid_for_null_filename():
     model = VTKSurfaceModel(None, colors.red)
     assert model.source is not None
 
+def test_its_valid_for_null_filename_with_errors():
+    error_observer = ErrorObserver()
+    model = VTKSurfaceModel(None, colors.red,
+        visibility=True, opacity=1.0, pickable=True,
+        error_observer=error_observer)
+
+    if error_observer.error_occurred():
+        raise RuntimeError(error_observer.error_message())
+
+    assert model.source is not None
 
 def test_invalid_because_filename_invalid():
     with pytest.raises(TypeError):

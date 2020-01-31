@@ -8,7 +8,9 @@ class ErrorObserver:
     def __init__(self):
         self.__error_occurred = False
         self.__error_message = None
-        self.call_data_type = 'string0'
+        #disable attribute name style, I think vtk requires CallDataType
+        #pylint: disable=C0103
+        self.CallDataType = 'string0'
 
     def __call__(self, obj, event, message):
         self.__error_occurred = True
