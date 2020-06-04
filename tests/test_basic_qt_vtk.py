@@ -13,7 +13,7 @@ from vtk.util.colors import tomato
 
 def test_qapp():
 
-    app = QApplication(['--platform offscreen'])
+    app = QApplication()
     dialog = QDialog()
     dialog.show()
 
