@@ -24,4 +24,5 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get install xvfb libxkbcommon-x11-0
+	  export QT_QPA_PLATFORM=xcb
           xvfb-run  -a python -m pytest -vv -s tests/test_basic_qt_vtk.py
