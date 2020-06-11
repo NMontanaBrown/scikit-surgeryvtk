@@ -2,6 +2,7 @@ import pytest
 import PySide2
 
 import sys
+
 from PySide2.QtWidgets import QApplication, QDialog, QLineEdit, QPushButton
 from sksurgeryvtk.widgets.vtk_overlay_window import VTKOverlayWindow
 
@@ -10,14 +11,19 @@ from sksurgeryvtk.widgets.QVTKRenderWindowInteractor \
 
 import vtk
 from vtk.util.colors import tomato
+@pytest.fixture(scope="session")
+def setup_qt():
 
-def test_qapp():
+    """ Create the QT application. """
+    app = QApplication([])
+    return app
+def test_qapp(setup_qt):
 
-    app = QApplication()
+    app = setup_qt
     dialog = QDialog()
     dialog.show()
 
-def test_vtk_cylinder():
+def test_vtk_cylinder(setup_qt):
     
     #Copied from https://vtk.org/Wiki/VTK/Examples/Python/Cylinder
 
@@ -70,15 +76,17 @@ def test_vtk_cylinder():
     #iren.Start()
 
 # This should pass
-def test_qvtkrenderwindowinteracto_dont_start():
+def test_qvtkrenderwindowinteracto_dont_start(setup_qt):
+    app = setup_qt
     widget = QVTKRenderWindowInteractor()
 
 # This should fail/crash
-def test_qvtkrenderwindowinteractor():
+def test_qvtkrenderwindowinteractor(setup_qt):
+    app = setup_qt
     widget = QVTKRenderWindowInteractor()
     widget.Start()
 
-def test_vtkoverlaywindow():
+def test_vtkoverlaywindow(setup_qt):
+    app = setup_qt
     widget = VTKOverlayWindow()
-
 

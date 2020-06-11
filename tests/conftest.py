@@ -18,9 +18,8 @@ def setup_qt():
     app = QApplication([])
     return app
 
-
 @pytest.fixture(scope="session")
-def setup_vtk_err(setup_qt):
+def setup_vtk_err():
 
     """ Used to send VTK errors to file instead of screen. """
 
@@ -28,7 +27,7 @@ def setup_vtk_err(setup_qt):
     err_out.SetFileName('tests/output/vtk.err.txt')
     vtk_std_err = vtk.vtkOutputWindow()
     vtk_std_err.SetInstance(err_out)
-    return vtk_std_err, setup_qt
+    return vtk_std_err
 
 
 @pytest.fixture(scope="function")
@@ -36,23 +35,23 @@ def setup_vtk_offscreen(setup_vtk_err):
 
     """ Used to ensure VTK renders to off screen window. """
 
-    vtk_std_err, setup_qt = setup_vtk_err
+    vtk_std_err = setup_vtk_err
 
     factory = vtk.vtkGraphicsFactory()
     factory.SetOffScreenOnlyMode(False)
     factory.SetUseMesaClasses(False)
-    return factory, vtk_std_err, setup_qt
+    return factory, vtk_std_err
 
 
 @pytest.fixture(scope="function")
-def setup_vtk_overlay_window(setup_vtk_offscreen):
+def setup_vtk_overlay_window(setup_vtk_err, setup_vtk_offscreen):
 
     """ Used to ensure VTK renders to off screen vtk_overlay_window. """
 
-    factory, vtk_std_err, setup_qt = setup_vtk_offscreen
+    factory, vtk_std_err = setup_vtk_offscreen
 
     vtk_overlay = VTKOverlayWindow(offscreen=False)
-    return vtk_overlay, factory, vtk_std_err, setup_qt
+    return vtk_overlay, factory, vtk_std_err, QApplication.instance()
 
 
 # Note: These windows will persist while all unit tests run.
@@ -77,11 +76,11 @@ def vtk_overlay_with_gradient_image(setup_vtk_overlay_window):
 
 
 @pytest.fixture(scope="function")
-def vtk_interlaced_stereo_window(setup_vtk_offscreen):
+def vtk_interlaced_stereo_window(setup_vtk_err, setup_vtk_offscreen):
 
     """ Used to ensure VTK renders to off screen vtk_interlaced_stereo_window. """
 
-    factory, vtk_std_err, setup_qt = setup_vtk_offscreen
+    factory, vtk_std_err = setup_vtk_offscreen
 
     vtk_interlaced = VTKStereoInterlacedWindow(offscreen=False)
-    return vtk_interlaced, factory, vtk_std_err, setup_qt
+    return vtk_interlaced, factory, vtk_std_err, QApplication.instance()
