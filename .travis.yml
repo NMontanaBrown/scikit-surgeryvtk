@@ -28,7 +28,7 @@ script:
   - coverage run -a --source ./sksurgeryvtk -m pytest -v -s ./tests/
   - coverage report -m
   - if [ $LINT == 1 ]; then
-    pylint --rcfile=tests/pylintrc sksurgeryvtk tests;
+    pylint --rcfile=tests/pylintrc sksurgeryvtk tests --extension-pkg-whitelist=vtk,cv2,PySide2 sksurgeryvtk;
     fi
 
 after_success:
