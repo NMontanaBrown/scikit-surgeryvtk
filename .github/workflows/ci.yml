@@ -5,7 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -28,3 +28,8 @@ jobs:
           export DISPLAY=":1"
           export QT_QPA_PLATFORM=offscreen
           xvfb-run  -a python -m pytest -vv -s tests/test_basic_qt_vtk.py
+
+      - name: Run tests on mac/windows
+        if: contains(matrix.os, 'o')
+        run: |
+          python -m pytest -vv -s tests/test_basic_qt_vtk.py
